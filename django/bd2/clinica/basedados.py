@@ -42,7 +42,25 @@ def atualizar_cliente(cliente_id, nome, email, telefone):
 
 def eliminar_cliente(cliente_id):
     with connection.cursor() as cursor:
-        cursor.execute("""DELETE FROM public."Clientes" WHERE id=%s;""", [cliente_id])
+        cursor.execute("""DELETE FROM public."Clientes" WHERE id=%s;""", [cliente_id]) 
+
+# 1. Número de clientes por estado de conformidade NIS2
+def clientes_por_conformidade_nis2():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                CASE
+                    WHEN score >= 75 THEN 'Conforme'
+                    WHEN score >= 40 THEN 'Em avaliação'
+                    ELSE 'Com pendências'
+                END AS estado_conformidade,
+                COUNT(*) AS total_clientes
+            FROM public."Clientes"
+            GROUP BY estado_conformidade
+            ORDER BY total_clientes DESC;
+        """)
+        colunas = [col[0] for col in cursor.description]
+        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
 
 
 # ===========================================================
@@ -133,6 +151,23 @@ def atualizar_documento(doc_id, nome, tipo, descricao):
 def eliminar_documento(doc_id):
     with connection.cursor() as cursor:
         cursor.execute("""DELETE FROM public."Documentos" WHERE id=%s;""", [doc_id])
+        
+# 3. Total de documentos submetidos por cliente e por mês
+def documentos_por_cliente_e_mes():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                c.nome AS nome_cliente,
+                TO_CHAR(d."createdAt", 'YYYY-MM') AS mes,
+                COUNT(d.id) AS total_documentos
+            FROM public."Documentos" d
+            LEFT JOIN public."Clientes" c ON d."ClienteId" = c.id
+            GROUP BY c.id, c.nome, TO_CHAR(d."createdAt", 'YYYY-MM')
+            ORDER BY mes DESC, total_documentos DESC;
+        """)
+        colunas = [col[0] for col in cursor.description]
+        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
+
 
 
 # ===========================================================
@@ -178,6 +213,21 @@ def atualizar_incidente(incidente_id, tipo, impacto, descricao, estado):
 def eliminar_incidente(incidente_id):
     with connection.cursor() as cursor:
         cursor.execute("""DELETE FROM public."Incidentes" WHERE id=%s;""", [incidente_id])
+        
+        
+# 2. Top 5 clientes com mais incidentes de segurança registados
+def top5_clientes_mais_incidentes():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT c.nome AS nome_cliente, COUNT(i.id) AS total_incidentes
+            FROM public."Clientes" c
+            LEFT JOIN public."Incidentes" i ON i."ClienteId" = c.id
+            GROUP BY c.id, c.nome
+            ORDER BY total_incidentes DESC
+            LIMIT 5;
+        """)
+        colunas = [col[0] for col in cursor.description]
+        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
 
 
 # ===========================================================
@@ -223,6 +273,27 @@ def atualizar_pedido(pedido_id, titulo, descricao, estado):
 def eliminar_pedido(pedido_id):
     with connection.cursor() as cursor:
         cursor.execute("""DELETE FROM public."Pedidos" WHERE id=%s;""", [pedido_id])
+        
+        
+# 5. Estado dos pedidos/tickets e tempo médio de resolução (em dias)
+def estado_pedidos_e_tempo_medio():
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                estado,
+                COUNT(*) AS total_pedidos,
+                ROUND(
+                    AVG(
+                        EXTRACT(EPOCH FROM ("updatedAt" - "createdAt")) / 86400.0
+                    )::numeric, 1
+                ) AS tempo_medio_dias
+            FROM public."Pedidos"
+            GROUP BY estado
+            ORDER BY total_pedidos DESC;
+        """)
+        colunas = [col[0] for col in cursor.description]
+        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
+
 
 
 # ===========================================================
@@ -269,62 +340,6 @@ def eliminar_admin(admin_id):
         cursor.execute("""DELETE FROM public."Admins" WHERE id=%s;""", [admin_id])
 
 
-# ===========================================================
-# FICHA 9 
-# ===========================================================
-
-# 1. Número de clientes por estado de conformidade NIS2
-#    (Conforme, Em avaliação, Com pendências) — baseado no score
-def clientes_por_conformidade_nis2():
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT
-                CASE
-                    WHEN score >= 75 THEN 'Conforme'
-                    WHEN score >= 40 THEN 'Em avaliação'
-                    ELSE 'Com pendências'
-                END AS estado_conformidade,
-                COUNT(*) AS total_clientes
-            FROM public."Clientes"
-            GROUP BY estado_conformidade
-            ORDER BY total_clientes DESC;
-        """)
-        colunas = [col[0] for col in cursor.description]
-        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
-
-
-# 2. Top 5 clientes com mais incidentes de segurança registados
-def top5_clientes_mais_incidentes():
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT c.nome AS nome_cliente, COUNT(i.id) AS total_incidentes
-            FROM public."Clientes" c
-            LEFT JOIN public."Incidentes" i ON i."ClienteId" = c.id
-            GROUP BY c.id, c.nome
-            ORDER BY total_incidentes DESC
-            LIMIT 5;
-        """)
-        colunas = [col[0] for col in cursor.description]
-        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
-
-
-# 3. Total de documentos submetidos por cliente e por mês
-def documentos_por_cliente_e_mes():
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT
-                c.nome AS nome_cliente,
-                TO_CHAR(d."createdAt", 'YYYY-MM') AS mes,
-                COUNT(d.id) AS total_documentos
-            FROM public."Documentos" d
-            LEFT JOIN public."Clientes" c ON d."ClienteId" = c.id
-            GROUP BY c.id, c.nome, TO_CHAR(d."createdAt", 'YYYY-MM')
-            ORDER BY mes DESC, total_documentos DESC;
-        """)
-        colunas = [col[0] for col in cursor.description]
-        return [dict(zip(colunas, row)) for row in cursor.fetchall()]
-
-
 # 4. Distribuição de utilizadores por perfil
 #    (Administrador, Colaborador/Gestor, Cliente)
 def distribuicao_utilizadores_por_perfil():
@@ -342,21 +357,3 @@ def distribuicao_utilizadores_por_perfil():
         return [dict(zip(colunas, row)) for row in cursor.fetchall()]
 
 
-# 5. Estado dos pedidos/tickets e tempo médio de resolução (em dias)
-def estado_pedidos_e_tempo_medio():
-    with connection.cursor() as cursor:
-        cursor.execute("""
-            SELECT
-                estado,
-                COUNT(*) AS total_pedidos,
-                ROUND(
-                    AVG(
-                        EXTRACT(EPOCH FROM ("updatedAt" - "createdAt")) / 86400.0
-                    )::numeric, 1
-                ) AS tempo_medio_dias
-            FROM public."Pedidos"
-            GROUP BY estado
-            ORDER BY total_pedidos DESC;
-        """)
-        colunas = [col[0] for col in cursor.description]
-        return [dict(zip(colunas, row)) for row in cursor.fetchall()]

@@ -55,19 +55,17 @@ WSGI_APPLICATION = 'bd2.wsgi.application'
 
 # ---------------------------------------------------------------------------
 # BASE DE DADOS — NeonDB (PostgreSQL)
-# Substitui os valores de DATABASE_URL pela tua connection string do Neon:
-#   https://console.neon.tech  → Project → Connection Details
 # ---------------------------------------------------------------------------
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',          # nome da base de dados no Neon
-        'USER': 'neondb_owner',    # utilizador do Neon
-        'PASSWORD': 'npg_i4tlUVF2QxjB',   # password do Neon
-        'HOST': 'ep-aged-dream-abu6uskx.eu-west-2.aws.neon.tech',  # host do Neon
+        'NAME': 'neondb',         
+        'USER': 'neondb_owner',    
+        'PASSWORD': 'npg_i4tlUVF2QxjB',   
+        'HOST': 'ep-aged-dream-abu6uskx.eu-west-2.aws.neon.tech',  
         'PORT': '5432',
         'OPTIONS': {
-            'sslmode': 'require',  # obrigatório no Neon
+            'sslmode': 'require',  
         },
     }
 }
