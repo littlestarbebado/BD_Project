@@ -1,7 +1,7 @@
 from django.db import connection
 
 # ===========================================================
-# OPERAÇÕES DE CLIENTES (tabela "Clientes" do Neon)
+# OPERAÇÕES DE CLIENTES 
 # ===========================================================
 
 def listar_clientes():
@@ -46,7 +46,7 @@ def eliminar_cliente(cliente_id):
 
 
 # ===========================================================
-# OPERAÇÕES DE ATIVOS TECNOLÓGICOS (tabela "AtivoTecnologicos")
+# OPERAÇÕES DE ATIVOS TECNOLÓGICOS 
 # ===========================================================
 
 def listar_ativos_tecnologicos():
@@ -91,7 +91,7 @@ def eliminar_ativo(ativo_id):
 
 
 # ===========================================================
-# OPERAÇÕES DE DOCUMENTOS (tabela "Documentos")
+# OPERAÇÕES DE DOCUMENTOS 
 # ===========================================================
 
 def listar_documentos():
@@ -136,7 +136,7 @@ def eliminar_documento(doc_id):
 
 
 # ===========================================================
-# OPERAÇÕES DE INCIDENTES (tabela "Incidentes")
+# OPERAÇÕES DE INCIDENTES 
 # ===========================================================
 
 def listar_incidentes():
@@ -181,7 +181,7 @@ def eliminar_incidente(incidente_id):
 
 
 # ===========================================================
-# OPERAÇÕES DE PEDIDOS/TICKETS (tabela "Pedidos")
+# OPERAÇÕES DE PEDIDOS/TICKETS 
 # ===========================================================
 
 def listar_pedidos():
@@ -226,7 +226,7 @@ def eliminar_pedido(pedido_id):
 
 
 # ===========================================================
-# OPERAÇÕES DE ADMINS (tabela "Admins")
+# OPERAÇÕES DE ADMINS 
 # ===========================================================
 
 def listar_admins():
@@ -270,7 +270,7 @@ def eliminar_admin(admin_id):
 
 
 # ===========================================================
-# FICHA 9 — QUERIES DE SELECT PARA O DASHBOARD
+# FICHA 9 
 # ===========================================================
 
 # 1. Número de clientes por estado de conformidade NIS2

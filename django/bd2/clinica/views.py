@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from . import basedados
 
 
-# Página Inicial — Dashboard com dados das 5 queries da Ficha 9
+# Página Inicial 
 def index(request):
     try:
         conformidade = basedados.clientes_por_conformidade_nis2()
