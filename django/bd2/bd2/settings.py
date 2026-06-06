@@ -59,17 +59,16 @@ WSGI_APPLICATION = 'bd2.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'neondb',         
-        'USER': 'neondb_owner',    
-        'PASSWORD': 'npg_i4tlUVF2QxjB',   
-        'HOST': 'ep-aged-dream-abu6uskx.eu-west-2.aws.neon.tech',  
+        'NAME': 'neondb',
+        'USER': 'neondb_owner',
+        'PASSWORD': 'npg_0stf7kGwbFXH',
+        'HOST': 'ep-lingering-shape-abrmiezh-pooler.eu-west-2.aws.neon.tech',
         'PORT': '5432',
         'OPTIONS': {
-            'sslmode': 'require',  
+            'sslmode': 'require',
         },
     }
 }
-
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -84,3 +83,4 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
